@@ -1,5 +1,22 @@
 from scapy.all import sniff, IP, TCP, UDP, Raw
 
+# Protocol number to name mapping
+protocol_map = {
+    1: "ICMP",
+    2: "IGMP",
+    4: "IPv4",
+    6: "TCP",
+    17: "UDP",
+    41: "IPv6",
+    47: "GRE",
+    50: "ESP",
+    51: "AH",
+    58: "ICMPv6",
+    89: "OSPF",
+    103: "PIM",
+    132: "SCTP"
+}
+
 # Function to process each captured packet
 def process_packet(packet):
     if IP in packet:
@@ -7,12 +24,11 @@ def process_packet(packet):
         ip_dst = packet[IP].dst
         protocol = packet[IP].proto
 
-        protocol_name = "Other"
+        protocol_name = protocol_map.get(protocol, "Other")
         src_port = "-"
         dst_port = "-"
 
-        if protocol == 6:  # TCP
-            protocol_name = "TCP"
+        if protocol_name == "TCP":
             src_port = packet[TCP].sport
             dst_port = packet[TCP].dport
 
@@ -29,32 +45,9 @@ def process_packet(packet):
                             log_file.write(f"{http_data}\n\n")
                         return
 
-        elif protocol == 17:  # UDP
-            protocol_name = "UDP"
+        elif protocol_name == "UDP":
             src_port = packet[UDP].sport
             dst_port = packet[UDP].dport
-        elif protocol == 1:  # ICMP
-            protocol_name = "ICMP"
-        elif protocol == 2:  # IGMP
-            protocol_name = "IGMP"
-        elif protocol == 50:  # ESP
-            protocol_name = "ESP"
-        elif protocol == 51:  # AH
-            protocol_name = "AH"
-        elif protocol == 89:  # OSPF
-            protocol_name = "OSPF"
-        elif protocol == 4:  # IPv4 encapsulation
-            protocol_name = "IPv4"
-        elif protocol == 41:  # IPv6 encapsulation
-            protocol_name = "IPv6"
-        elif protocol == 47:  # GRE
-            protocol_name = "GRE"
-        elif protocol == 58:  # ICMPv6
-            protocol_name = "ICMPv6"
-        elif protocol == 103:  # PIM
-            protocol_name = "PIM"
-        elif protocol == 132:  # SCTP
-            protocol_name = "SCTP"
 
         print(f"{protocol_name} Packet: {ip_src}:{src_port} -> {ip_dst}:{dst_port}")
 
